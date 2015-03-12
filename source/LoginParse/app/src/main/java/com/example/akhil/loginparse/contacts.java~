@@ -1,0 +1,309 @@
+package com.example.akhil.loginparse;
+
+import android.app.ActionBar;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.provider.ContactsContract;
+import android.content.ContentResolver;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class contacts extends Activity implements Comparable<contacts> {
+
+
+    ArrayAdapter<contact> adapter;
+    ArrayList selectedcontacts = new ArrayList<String>();
+    ArrayList names = new ArrayList<contact>();
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+        ActionBar actionBar = getActionBar();
+        assert actionBar != null;
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#545454")));
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+       // ArrayList names = new ArrayList<contact>();
+        EditText inputSearch;
+        LayoutInflater inflater;
+        inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        setContentView(R.layout.activity_contacts);
+        ContentResolver cr = getContentResolver();
+        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                null, null, null, null);
+        if (cur.getCount() > 0) {
+            while (cur.moveToNext()) {
+                //String id = cur.getString(
+                //        cur.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cur.getString(
+                        cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                //TextView temp = new TextView(this);
+                //temp.setText(name);
+
+                //EditText temp = (EditText) findViewById(R.id.contactname);
+                //temp.setText(name);
+                //System.out.print(name);
+                if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+                    //System.out.print(name);
+                    contact con = new contact(name, false);
+                    names.add(con);
+                }
+                //return names;
+            }
+
+            contact[] arrname = new contact[names.size()];
+            //contact variable = arrname[1];
+           /* Toast.makeText(getApplicationContext(),
+                    arrname[0].name,
+                    Toast.LENGTH_LONG).show();*/
+            names.toArray(arrname);
+            //Toast.makeText(this,dsf[1],Toast.LENGTH_SHORT);
+            Arrays.sort(arrname);
+            Collections.sort(names, new Comparator<contact>(){
+                @Override
+                public int compare(contact a, contact b)
+                {
+                    return a.name.compareTo(b.name);
+                }
+            });
+            ListView tem = (ListView) findViewById(R.id.contactnames);
+            inputSearch = (EditText) findViewById(R.id.inputSearch);
+            //adapter = new ArrayAdapter<contact>(this, android.R.layout.simple_list_item_1,
+            //        android.R.id.text1, arrname);
+            adapter = new CustomAdapter(this, R.layout.contact_info, names);
+            //CustomAdapter adapter = new CustomAdapter(this, R.layout.activity_fetch_contacts
+            //              , names);
+            tem.setAdapter(adapter);
+
+
+
+            inputSearch.addTextChangedListener(new TextWatcher() {
+
+                @Override
+                public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+                    // When user changed the Text
+                    contacts.this.adapter.getFilter().filter(cs);
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+                                              int arg3) {
+                    // TODO Auto-generated method stub
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable arg0) {
+                    // TODO Auto-generated method stub
+                }
+            });
+            //setListAdapter(adapter);
+        }
+
+
+        ImageButton next2 = (ImageButton) findViewById(R.id.NextStep);
+        next2.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(contacts.this, Summary.class);
+                Intent prev = getIntent();
+                Bundle B = prev.getExtras();
+                String EventName = B.getString("EventName");
+                String EventType = B.getString("EventType");
+                Bundle Bundlename = new Bundle();
+                Bundlename.putString("EventName", EventName);
+                Bundlename.putString("EventType", EventType);
+                intent.putExtras(Bundlename);
+                // Log.w("abc",B.getString("EventName").toString());*/
+                startActivity(intent);
+
+
+            }
+        });
+    }
+    //here is checkbox code
+
+    private class CustomAdapter extends ArrayAdapter<contact> {
+
+        private ArrayList<contact> contactlist;
+        private ArrayList<contact> filtered;
+        public CustomAdapter(Context context, int textViewResourceId, ArrayList<contact> contactlist) {
+            super(context, textViewResourceId, contactlist);
+            this.filtered = contactlist;
+            this.contactlist = new ArrayList<contact>();
+            this.contactlist.addAll(contactlist);
+        }
+        private class ViewHolder {
+            //TextView code;
+            CheckBox name;
+        }
+
+        @Override
+        public View getView (int position, View convertView, ViewGroup parent) {
+            ViewHolder holder = null;
+            Log.v("ConvertView", String.valueOf(position));
+
+            if (convertView == null) {
+                LayoutInflater vi = (LayoutInflater) getSystemService(
+                        Context.LAYOUT_INFLATER_SERVICE);
+                convertView = vi.inflate(R.layout.contact_info, null);
+
+                holder = new ViewHolder();
+                //  holder.code = (TextView) convertView.findViewById(R.id.code);
+                holder.name = (CheckBox) convertView.findViewById(R.id.checkBox1);
+                convertView.setTag(holder);
+
+                holder.name.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        CheckBox cb = (CheckBox) v;
+                        contact contactselected = (contact) cb.getTag();
+                        Toast.makeText(getApplicationContext(),
+                                "Clicked on Checkbox: " + cb.getText() +
+                                        " is " + cb.isChecked(),
+                                Toast.LENGTH_LONG
+                        ).show();
+                        contactselected.selected = true;
+                        selectedcontacts.add(cb.getText());
+                        //country.setSelected(cb.isChecked());
+                    }
+                });
+            }
+            else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+            contact country = filtered.get(position);
+            //holder.code.setText(country.name);
+            holder.name.setText(country.name);
+            holder.name.setChecked(country.selected);
+            holder.name.setTag(country);
+
+            return convertView;
+
+        }
+
+        //checkbox filter
+        Filter myFilter = new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence cons) {
+                FilterResults filterResults = new FilterResults();
+                ArrayList<contact> tempList = new ArrayList<contact>();
+                contactlist = names;
+                if(cons != null && contactlist != null) {
+                    int length = contactlist.size();
+                    Log.v("contactlist size-", String.valueOf(length));
+                    int i=0;
+                    while(i<length){
+                        contact item = contactlist.get(i);
+                        if(item.name.toLowerCase().contains(cons)) {
+                            tempList.add(item);
+                        }
+                        i++;
+                    }
+                    filterResults.values = tempList;
+                    filterResults.count = tempList.size();
+                }
+                return filterResults;
+            }
+            @SuppressWarnings("unchecked")
+            @Override
+            protected void publishResults(CharSequence cons, FilterResults results){
+                filtered = (ArrayList<contact>)results.values;
+                if(results.count>0){
+                    notifyDataSetChanged();
+                    clear();
+                    Log.v("Filter size-", String.valueOf(filtered.size()));
+                    for(int i = 0, l = filtered.size(); i < l; i++)
+                        add(filtered.get(i));
+                } else {
+                    notifyDataSetInvalidated();
+                }
+            }
+        };
+
+        @Override
+        public Filter getFilter() {
+            return myFilter;
+        }
+
+    }
+
+    //here it finishes
+
+    /*class MySalaryComp implements Comparator<ArrayList<String>> {
+
+        @Override
+        public int compare(ArrayList<String> e1, ArrayList<String> e2) {
+            return e1.get(1).compareTo(e2.get(1));
+        }
+    }*/
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.contacts, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public int compareTo(contacts another) {
+        return 0;
+    }
+
+
+    /*public static Map<String> getPhonebook(Context context)
+    {
+        Map<String> result = new HashMap<String>();
+        Cursor cursor = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,null,null,null);
+        while(cursor.moveToNext())
+        {
+            int name_id = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+            String name = cursor.getString(name_id);
+            result.put(name);
+        }
+        return result;
+    }*/
+}

@@ -1,0 +1,428 @@
+package com.example.akhil.loginparse;
+
+import android.app.ActionBar;
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Environment;
+import android.util.Log;
+import android.view.Menu;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ViewFlipper;
+
+import com.facebook.FacebookRequestError;
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.model.GraphUser;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+
+
+public class inviterecord extends Activity {
+
+    ParseFile mAudio;
+    private MediaRecorder myAudioRecorder;
+    private String outputFile = null ;
+    private ImageButton start, stop, play, pause, tick, cancel, next, prev;
+    private File file;
+    private ViewFlipper viewFlipper;
+    private ParseUser  user = ParseUser.getCurrentUser();
+
+    private MediaPlayer m = null;
+    private int cnt, time;
+    private CountDownTimer t1, t2;
+    private TextView txtcount, flipper_content_1, flipper_content_2, flipper_content_3;
+    private ParseObject AudioUpload;
+    void addClick(){
+        Intent intent = new Intent(getBaseContext(), contacts.class);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        byte[] buf = new byte[1024];
+        int n;
+        assert fis != null;
+        try {
+            while (-1 != (n = fis.read(buf)))
+                baos.write(buf, 0, n);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        byte[] videoBytes = baos.toByteArray();
+        final String videoFileName;
+        videoFileName = "thisisit";
+        mAudio = new ParseFile(videoFileName, videoBytes);
+        mAudio.saveInBackground();
+        AudioUpload.put("AudioName", videoFileName);
+        AudioUpload.put("AudioFile", mAudio);
+        AudioUpload.saveInBackground();
+        /*Intent prev = getIntent();
+        Bundle B = prev.getExtras();
+        String EventName=B.getString("EventName");
+        String EventType=B.getString("EventType");
+        Bundle newbundle = new Bundle();
+        newbundle.putString("EventName",EventName);
+        newbundle.putString("EventType",EventType);
+        intent.putExtras(newbundle);*/
+
+        //ParseObject AudioUpload = new ParseObject("Audios");
+
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ActionBar actionBar = getActionBar();
+        assert actionBar != null;
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#545454")));
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        //actionBar.setTitle("Event Name");
+        // Fetch Facebook user info if the session is active
+        Session session = ParseFacebookUtils.getSession();
+        if (session != null && session.isOpened()) {
+            makeMeRequest();
+        }
+
+        setContentView(R.layout.voiceinvite);
+
+        start = (ImageButton) findViewById(R.id.recordImageView);
+        stop = (ImageButton) findViewById(R.id.stopImageView);
+        play = (ImageButton) findViewById(R.id.playImageView);
+
+        pause = (ImageButton) findViewById(R.id.pauseImageView);
+        tick = (ImageButton) findViewById(R.id.tickImageView);
+        cancel = (ImageButton) findViewById(R.id.cancelImageView);
+        viewFlipper = (ViewFlipper) findViewById(R.id.ViewFlipper1);
+        flipper_content_1 = (TextView) findViewById(R.id.flipperContent1);
+        flipper_content_2 = (TextView) findViewById(R.id.flipperContent2);
+        flipper_content_3 = (TextView) findViewById(R.id.flipperContent3);
+        if(user.get("profile")!=null){
+            JSONObject userProfile = user.getJSONObject("profile");
+        try {
+            if(userProfile.getString("name")!=null) {
+             /*   flipper_content_1.setText("Hello, i'm " + userProfile.getString("name") + ". We’re blowing up balloons and icing the cake!There’s \na big birthday party and we hope \nyou can make it!");
+                flipper_content_2.setText("Hello, i'm " + userProfile.getString("name") + ". Because we have shared so much in our lives by our friendship and love; we invite you to the 25th Wedding Anniversary celebrations of our parents ");
+                flipper_content_3.setText("Hello, i'm " + userProfile.getString("name") + ". We would be \npleased to have you join us for a party announcing our engagement ");
+            */
+                ParseQuery<ParseObject> queryAudio = ParseQuery.getQuery("Audios");
+                queryAudio.whereEqualTo("userObjID", user.getObjectId().toString());
+                queryAudio.addDescendingOrder("eventCounter");
+                queryAudio.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> parseObjects, ParseException e) {
+                        if(e == null) {
+                            AudioUpload = parseObjects.get(0);
+                        }
+                        else{
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                String eventType = AudioUpload.get("eventType").toString();
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("SampleText");
+            //I4soQZWszw - Aniversary
+            //dUT7YhOSpf - Birthday
+            query.whereEqualTo("eventType", eventType);
+                query.getFirstInBackground(new GetCallback<ParseObject>() {
+                    @Override
+                    public void done(ParseObject parseObject, com.parse.ParseException e) {
+                        if (e == null) {
+                            try {
+                                flipper_content_1.setText(parseObject.getJSONArray("textArray").get(0).toString());
+                                flipper_content_2.setText(parseObject.getJSONArray("textArray").get(1).toString());
+                                flipper_content_3.setText(parseObject.getJSONArray("textArray").get(2).toString());
+                            } catch (JSONException e1) {
+                                e1.printStackTrace();
+                            }
+
+                        } else {
+                            // something went wrong
+                            flipper_content_1.setText("no text available");
+                            flipper_content_2.setText("no text available");
+                            flipper_content_3.setText("no text available");
+
+                        }
+                    }
+                });
+            }
+            else{
+                flipper_content_1.setText("login to continue");
+                flipper_content_2.setText("login to continue");
+                flipper_content_3.setText("login to continue");
+            }
+        } catch (JSONException e) {
+            Log.d("MyApp",
+                    "Error parsing saved user data.");
+        }}
+        next = (ImageButton) findViewById(R.id.nextImageView);
+        prev = (ImageButton) findViewById(R.id.prevImageView);
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewFlipper.showNext();
+            }
+        });
+        prev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewFlipper.showPrevious();
+            }
+        });
+        //stop.setEnabled(false);
+        //play.setEnabled(false);
+        txtcount = (TextView) findViewById(R.id.txtCount);
+
+        outputFile = Environment.getExternalStorageDirectory().
+                getAbsolutePath() + "/myrecording.3gp";
+        file = new File(outputFile);
+
+
+        tick.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                t1.cancel();
+                Toast.makeText(getApplicationContext(), "audio confirmed", Toast.LENGTH_LONG).show();
+                switch (v.getId()){
+                    case R.id.tickImageView:
+                        addClick();
+                        break;
+                }
+            }
+        });
+
+        t1 = new CountDownTimer( Long.MAX_VALUE , 1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+                cnt++;
+                String time = new Integer(cnt).toString();
+
+                long millis = cnt;
+                int seconds = (int) (millis / 60);
+                int minutes = seconds / 60;
+                seconds     = seconds % 60;
+
+                txtcount.setText(String.format("%02d:%02d", seconds,millis));
+
+            }
+
+            @Override
+            public void onFinish() {            }
+        };
+        t2 = new CountDownTimer( Long.MAX_VALUE , 1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+                cnt--;
+                String time = new Integer(cnt).toString();
+
+                long millis = cnt;
+                int seconds = (int) (millis / 60);
+                int minutes = seconds / 60;
+                seconds     = seconds % 60;
+
+                txtcount.setText(String.format("%d:%02d", minutes, seconds));
+
+            }
+
+            @Override
+            public void onFinish() {            }
+        };
+
+    }
+
+    private void makeMeRequest() {
+        Request request = Request.newMeRequest(ParseFacebookUtils.getSession(),
+                new Request.GraphUserCallback() {
+                    @Override
+                    public void onCompleted(GraphUser user, Response response) {
+                        if (user != null) {
+                            // Create a JSON object to hold the profile info
+                            JSONObject userProfile = new JSONObject();
+                            try {
+                                // Populate the JSON object
+                                userProfile.put("facebookId", user.getId());
+                                userProfile.put("name", user.getName());
+                              /*  if (user.getLocation().getProperty("name") != null) {
+                                    userProfile.put("location", (String) user
+                                            .getLocation().getProperty("name"));
+                                }*/
+                                // Save the user profile info in a user property
+                                ParseUser currentUser = ParseUser
+                                        .getCurrentUser();
+                                currentUser.put("profile", userProfile);
+                                currentUser.saveInBackground();
+
+                                // Show the user info
+                               // updateViewsWithProfileInfo();
+                            } catch (JSONException e) {
+                                Log.d("MyApp",
+                                        "Error parsing returned user data.");
+                            }
+
+                        } else if (response.getError() != null) {
+                            if ((response.getError().getCategory() == FacebookRequestError.Category.AUTHENTICATION_RETRY)
+                                    || (response.getError().getCategory() == FacebookRequestError.Category.AUTHENTICATION_REOPEN_SESSION)) {
+                                Log.d("MyApp",
+                                        "The facebook session was invalidated.");
+                                //onLogoutButtonClicked();
+                            } else {
+                                Log.d("MyApp",
+                                        "Some other error: "
+                                                + response.getError()
+                                                .getErrorMessage());
+                            }
+                        }
+                    }
+                });
+        request.executeAsync();
+
+    }
+
+    public void start(View view){
+        try {
+            myAudioRecorder = new MediaRecorder();
+            myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+            myAudioRecorder.setOutputFile(outputFile);
+            myAudioRecorder.prepare();
+            myAudioRecorder.start();
+            m = null;
+        } catch (IllegalStateException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        stop.setVisibility(View.VISIBLE);
+        start.setVisibility(View.GONE);
+        t1.start();
+        Toast.makeText(getApplicationContext(), "Recording started", Toast.LENGTH_LONG).show();
+
+    }
+
+    public void stop(View view){
+        myAudioRecorder.stop();
+        myAudioRecorder.release();
+        myAudioRecorder  = null;
+        //play.setEnabled(true);
+        tick.setVisibility(View.VISIBLE);
+        cancel.setVisibility(View.VISIBLE);
+        stop.setVisibility(View.GONE);
+        play.setVisibility(View.VISIBLE);
+        //m = new MediaPlayer();
+        //m.setDataSource(outputFile);
+
+        //tick.setEnabled(true);
+        //cancel.setEnabled(true);
+        t1.cancel();
+        time = cnt;
+        Toast.makeText(getApplicationContext(), "Audio recorded successfully",
+                Toast.LENGTH_LONG).show();
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.my, menu);
+        return true;
+    }
+    public void play(View view) throws IllegalArgumentException,
+            SecurityException, IllegalStateException, IOException{
+        //if(m.isPa)
+        if( m == null){
+        m = new MediaPlayer();
+        m.setDataSource(outputFile);
+        m.prepare();
+        }
+
+        m.start();
+        /*if(txtcount.getText() == "00:00") {
+            play.setVisibility(View.VISIBLE);
+            pause.setVisibility(View.GONE);
+            //if(m.isPlaying()){
+                m.pause();
+                t2.cancel();
+            //}
+            cnt = time;
+        }*/
+        //t2.start();
+        //txtcount.setText("00:00");
+        Toast.makeText(getApplicationContext(), "Playing audio", Toast.LENGTH_LONG).show();
+        pause.setVisibility(View.VISIBLE);
+        play.setVisibility(View.GONE);
+
+    }
+
+    public void cancel(View view) {
+        File file = new File(outputFile);
+        boolean deleted = file.delete();
+        //start.setEnabled(true);
+        start.setVisibility(View.VISIBLE);
+        //cancel.setEnabled(false);
+        //tick.setEnabled(false);
+        cancel.setVisibility(View.INVISIBLE);
+        tick.setVisibility(View.INVISIBLE);
+        play.setVisibility(View.GONE);
+        pause.setVisibility(View.GONE);
+        stop.setVisibility(View.GONE);
+        cnt = 0;
+        //t2.cancel();
+        txtcount.setText("00:00");
+        Toast.makeText(getApplicationContext(), "audio deleted", Toast.LENGTH_LONG).show();
+
+    }
+
+    /*public void tick(View view) {
+       start.setVisibility(View.VISIBLE);
+        play.setVisibility(View.GONE);
+        pause.setVisibility(View.GONE);
+        stop.setVisibility(View.GONE);
+        tick.setVisibility(View.INVISIBLE);
+        cancel.setVisibility(View.INVISIBLE);
+        Toast.makeText(getApplicationContext(), "audio confirmed", Toast.LENGTH_LONG).show();
+    }*/
+    public void pause(View view) {
+        play.setVisibility(View.VISIBLE);
+        pause.setVisibility(View.GONE);
+        //t2.cancel();
+        if(m.isPlaying()){
+            m.pause();
+
+        }
+    }
+}

@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#e4e4e4e4"
+    android:paddingTop="10dp"
+    android:weightSum="1"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingBottom="5dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Event Details"
+            android:id="@+id/textView"
+            android:background="#ffffffff"
+            android:padding="2dp"
+            android:textColor="#7e7e7e"
+            android:layout_weight="0.33"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:padding="2dp"
+            android:weightSum="1"
+            android:layout_weight="0.33"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="#7e7e7e"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Event Name:"
+                android:id="@+id/textView2"
+                android:layout_weight="0.5"
+                android:padding="2dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical|right"
+                android:layout_marginRight="10dp"
+                android:textSize="20sp" />
+
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/nameofevent"
+                android:autoText="false"
+                android:layout_weight="0.5"
+                android:padding="2dp"
+                android:textColor="#7e7e7e"
+                android:layout_marginLeft="2dp"
+                android:gravity="center_vertical"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:padding="2dp"
+            android:weightSum="1"
+            android:layout_weight="0.33">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Event Type :"
+                android:id="@+id/textView7"
+                android:textColor="#7e7e7e"
+                android:layout_weight="0.5"
+                android:padding="2dp"
+                android:autoText="false"
+                android:gravity="center_vertical|right"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="15dp"
+                android:textSize="20sp" />
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/typeofevent"
+                android:layout_weight="0.5"
+
+                android:layout_marginLeft="2dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:background="#ffffffff"
+        android:id="@+id/voiceplayer"
+        android:paddingLeft="10dp"
+        android:paddingBottom="10dp"
+        android:paddingRight="10dp">
+
+        <SeekBar
+            android:id="@+id/seek_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="00:00"
+            android:id="@+id/timeDisplay"
+            android:textSize="10sp"
+            android:layout_gravity="right" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal">
+
+            <ImageButton
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/play_button"
+                android:src="@drawable/play"
+                android:background="#ffffffff"
+                android:layout_gravity="center_horizontal"
+                android:scaleType="fitXY" />
+
+            <ImageButton
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/pause_button"
+                android:src="@drawable/pause"
+                android:background="#ffffffff"
+                android:layout_gravity="center_horizontal"
+                android:scaleType="fitXY"
+                android:visibility="gone" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Record the message again"
+        android:id="@+id/button"
+        android:clickable="true"
+        android:padding="10dp"
+        android:onClick="backToRecording"
+        android:layout_marginTop="2dp" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:paddingBottom="10dp"
+        android:id="@+id/linearLayout">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Schedule"
+            android:id="@+id/textView3"
+            android:textColor="#7e7e7e"
+            android:layout_weight="0.33"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical|center_horizontal" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:padding="2dp"
+            android:weightSum="1"
+            android:layout_weight="0.33" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Date"
+                android:textColor="#7e7e7e"
+                android:id="@+id/textView4"
+                android:layout_weight="0.5"
+                android:background="#ffffffff"
+                android:padding="2dp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.5"
+                android:background="#ffffffff"
+                android:layout_marginLeft="2dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="DD/MM/YYY"
+                    android:textColor="#7e7e7e"
+                    android:id="@+id/scheduleDate"
+                    android:layout_weight="0.3"
+                    android:background="#ffffffff"
+                    android:padding="2dp" />
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/imageButton2"
+                    android:src="@drawable/calendar"
+                    android:onClick="showDatePickerDialog"
+                    android:background="#ffffffff"
+                    android:layout_weight="0.7"
+                    android:scaleType="fitXY" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:padding="2dp"
+            android:weightSum="1"
+            android:layout_weight="0.33" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Time"
+                android:id="@+id/textView5"
+                android:background="#ffffffff"
+                android:textColor="#7e7e7e"
+                android:layout_weight="0.5"
+                android:padding="2dp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.5"
+                android:background="#ffffffff"
+                android:layout_marginLeft="2dp">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="HH:MM"
+                    android:id="@+id/scheduleTime"
+                    android:textColor="#7e7e7e"
+                    android:layout_weight="0.3"
+                    android:background="#ffffffff"
+                    android:padding="2dp" />
+
+                <ImageButton
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:id="@+id/imageButton3"
+                    android:src="@drawable/watch"
+                    android:onClick="showTimePickerDialog"
+                    android:background="#ffffffff"
+                    android:layout_weight="0.7"
+                    android:scaleType="fitXY" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/linearLayout2"
+        android:background="#10545454"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="2dp">
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/Button"
+            android:layout_weight="0.5"
+            android:text="Save for later"
+            android:onClick="completed"
+            android:textColor="#FFFFFF"
+            android:baselineAlignBottom="false"
+            android:layout_marginTop="10dp"
+            android:background="#eb460f"
+            android:clickable="true"
+            android:layout_marginBottom="2dp" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/Button2"
+            android:layout_weight="0.5"
+            android:text="Call"
+            android:onClick="completed"
+            android:textColor="#FFFFFF"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"
+            android:background="#ff7ba512"
+            android:clickable="true"
+            android:layout_marginBottom="2dp" />
+    </LinearLayout>
+
+</LinearLayout>
+
+    </ScrollView>

@@ -1,0 +1,320 @@
+package com.example.akhil.loginparse;
+
+import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.TimePickerDialog;
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.text.format.DateFormat;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TimePicker;
+
+import com.parse.FindCallback;
+import com.parse.GetDataCallback;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.List;
+
+
+public class Summary extends Activity {
+
+    SeekBar seek_bar;
+    ImageButton play_button, pause_button;
+    MediaPlayer player;
+    TextView text_shown;
+    Handler seekHandler = new Handler();
+    TextView scheduleDate, scheduleTime;
+
+
+    private ParseUser user = ParseUser.getCurrentUser();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_summary);
+        Intent prev = getIntent();
+        Bundle B = prev.getExtras();
+        String Eve=B.getString("EventName");
+        String Even=B.getString("EventType");
+        final EditText nameevent = (EditText) findViewById(R.id.nameofevent);
+        nameevent.setText(Eve);
+        Spinner spinner = (Spinner) findViewById( R.id.typeofevent );
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource( this, R.array.event_types , android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        String myString = Even; //the value you want the position for
+        scheduleDate = (TextView) findViewById(R.id.scheduleDate);
+        scheduleTime = (TextView) findViewById(R.id.scheduleTime);
+
+        ArrayAdapter myAdap = (ArrayAdapter) spinner.getAdapter(); //cast to an ArrayAdapter
+
+        int spinnerPosition = myAdap.getPosition(myString);
+
+        spinner.setSelection(spinnerPosition);
+        Log.d("ageani", user.getObjectId().toString());
+        ParseQuery<ParseObject> queryAudio = ParseQuery.getQuery("Audios");
+        queryAudio.whereEqualTo("userObjID", user.getObjectId().toString());
+        queryAudio.addDescendingOrder("eventCounter");
+        queryAudio.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, com.parse.ParseException e) {
+                if(e == null) {
+                    Log.d("11audionextErrors", parseObjects.get(0).getObjectId());
+                    ParseObject audio = parseObjects.get(0);
+                    ParseFile sound = (ParseFile) audio.get("AudioFile");
+                    sound.getDataInBackground(new GetDataCallback() {
+                        @Override
+                        public void done(byte[] data, com.parse.ParseException e1) {
+                            if (e1 == null) {
+                                // data has the bytes for the resume
+                                //ImageView image = (ImageView) findViewById(R.id.img);
+                                //FileInputStream fileInputStream=null;
+
+                                //File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/audioretrive.3gp");
+                                try {
+                                    //convert file into array of bytes
+                                    //fileInputStream = new FileInputStream(file);
+                                    //fileInputStream.read(data);
+                                    //fileInputStream.close();
+
+                                    //convert array of bytes into file
+                                    File file;
+                                    String outputFile = null;
+                                    outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/retrive.3gp";
+                                    file = new File(outputFile);
+
+                                    FileOutputStream outputStream = new FileOutputStream(file);
+                                    outputStream.write(data);
+                                    outputStream.close();
+                                    getInit();
+                                    seekUpdation();
+                                    try{
+                                        player.prepare();
+
+                                    }
+                                    catch (IOException e) {
+                                        e.printStackTrace();
+
+                                    }
+                                    Log.d("here", "done");
+                                }catch(Exception e2){
+                                    e2.printStackTrace();
+                                }
+                                //Bitmap bMap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                //image.setImageBitmap(bMap);
+
+
+                            } else {
+                                // something went wronge.p
+                                e1.printStackTrace();
+                            }
+                        }
+                        });
+
+
+
+                    //ParseObject AudioUpload = new ParseObject("Audios");
+                }
+                else {
+                    // something went wrong
+                    Log.d("audionextErrors", "start");
+                    e.printStackTrace();
+                    //Log.d("parseobjects:P", parseObject.getObjectId());
+                    //flipper_content_1.setText("no text available");
+                    //flipper_content_2.setText("no text available");
+                    //flipper_content_3.setText("no text available");
+
+                }
+            }
+        });
+
+
+        /**
+         *
+         ParseQuery<ParseObject> queryAudio = ParseQuery.getQuery("Audios");
+         queryAudio.whereEqualTo("userObjID", user.getObjectId().toString());
+         queryAudio.addDescendingOrder("eventCounter");
+         queryAudio.findInBackground(new FindCallback<ParseObject>() {
+        @Override
+        public void done(List<ParseObject> parseObjects, com.parse.ParseException e) {
+        if(e == null) {
+         parseObjects.get(0).put("ScheduleDate", scheduleDate.getText().toString());
+        parseObjects.get(0).put("ScheduleTime", scheduleTime .getText().toString());
+
+         * }
+         */
+
+    }
+    public static class TimePickerFragment extends DialogFragment
+            implements TimePickerDialog.OnTimeSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current time as the default values for the picker
+            final Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+
+            // Create a new instance of TimePickerDialog and return it
+            return new TimePickerDialog(getActivity(), this, hour, minute,
+                    DateFormat.is24HourFormat(getActivity()));
+        }
+
+        public void onTimeSet(TimePicker view, int hour, int minute) {
+            // Do something with the time chosen by the user set in textview
+
+            final TextView time = (TextView) getActivity().findViewById(R.id.scheduleTime);
+            //String a= (String)hour;
+            time.setText(""+hour+":"+minute);
+
+        }
+    }
+
+
+    public void showTimePickerDialog(View v) {
+        // FragmentManager newfrag = new FragmentManager;
+
+        DialogFragment newFragment = new TimePickerFragment();
+        newFragment.show(getFragmentManager(), "timePicker");
+
+    }
+
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            // Do something with the date chosen by the user
+            final TextView date = (TextView) getActivity().findViewById(R.id.scheduleDate);
+            date.setText(""+day+"/"+month+"/"+year);
+        }
+    }
+
+    public void showDatePickerDialog(View v) {
+        DialogFragment newFragment = new DatePickerFragment();
+        newFragment.show(getFragmentManager(), "datePicker");
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.summary, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void getInit() {
+        seek_bar = (SeekBar) findViewById(R.id.seek_bar);
+        play_button = (ImageButton) findViewById(R.id.play_button);
+        pause_button = (ImageButton) findViewById(R.id.pause_button);
+        play_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                player.start();
+                play_button.setVisibility(View.GONE);
+                pause_button.setVisibility(View.VISIBLE);
+            }
+        });
+        pause_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                player.pause();
+                pause_button.setVisibility(View.GONE);
+                play_button.setVisibility(View.VISIBLE);
+            }
+        });
+        File mp3File = new File(Environment.getExternalStorageDirectory(), "/retrive.3gp");
+        final Uri mediaUri = Uri.fromFile(mp3File);
+        player = MediaPlayer.create(this, mediaUri);
+        seek_bar.setMax(player.getDuration());
+        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                try{
+                    //player.stop();
+                    //player.reset();
+                    //player.setDataSource(, mediaUri);
+                    player.pause();
+                    player.seekTo(0);
+                    pause_button.setVisibility(View.GONE);
+                    play_button.setVisibility(View.VISIBLE);
+
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+
+
+
+    }
+
+    Runnable run = new Runnable() {
+
+        @Override
+        public void run() {
+            seekUpdation();
+
+        }
+    };
+
+    public void seekUpdation() {
+
+        seek_bar.setProgress(player.getCurrentPosition());
+        seekHandler.postDelayed(run, 1000);
+    }
+
+
+
+
+
+}

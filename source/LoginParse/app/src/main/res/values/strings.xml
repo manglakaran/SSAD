@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Inviti</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="Recording">This is where you record your invite.</string>
+
+    <!-- Login/Account creation screen -->
+    <string name="app_id">641956042587621</string>
+    <string name="signIn">Sign In</string>
+    <string name="submit">Submit</string>
+    <string name="orText">Or</string>
+    <string name="createAccount">Create Account</string>
+    <string name="emailHint">Email</string>
+    <string name="usernameHint">Username</string>
+    <string name="passwordHint">Password</string>
+    <string name="confirmPasswordHint">Confirm Password</string>
+    <string name="title_activity_launcher">LauncherActivity</string>
+    <string name="changing_fragments">Changing Fragments</string>
+    <string name="title_activity_create_account">CreateAccountActivity</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="dummy_section_text">dummy section txt as 123</string>
+    <string name="action_logout">logout</string>
+    <string name="demo_external_activity">Demo External Activity</string>
+    <string name="demo_collection">SUBMIT</string>
+    <string name="accept">Create Event</string>
+
+    <string-array name="event_types">
+        <item>Birthday</item>
+        <item>Anniversary</item>
+        <item>Reception</item>
+        <item>Wedding</item>
+        <item>Engagement</item>
+        <item>HouseWarming</item>
+    </string-array>
+
+    <string name="title_activity_contacts">contacts</string>
+    <string name="title_activity_fblogin">fblogin</string>
+    <string name="title_activity_summary">Summary</string>
+
+</resources>

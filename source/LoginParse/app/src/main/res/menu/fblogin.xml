@@ -1,0 +1,37 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.akhil.loginparse.fblogin"
+    >
+    <item
+        android:id="@+id/action_overflow"
+        android:icon="@drawable/ic_action_overflow"
+        android:menuCategory="container"
+        android:orderInCategory="400"
+        android:showAsAction="always"
+        android:visible="true"
+        android:title="menu">
+        <menu>
+            <item
+                android:id="@+id/action_logout"
+                android:orderInCategory="100"
+                android:showAsAction="never"
+                android:title="@string/action_logout"/>
+
+            <item
+                android:id="@+id/action_about"
+                android:orderInCategory="100"
+                android:showAsAction="never"
+                android:title="about us"/>
+
+            <item
+                android:id="@+id/action_contact"
+                android:orderInCategory="100"
+                android:showAsAction="never"
+                android:title="Contact us"/>
+
+
+        </menu>
+    </item>
+
+
+</menu>

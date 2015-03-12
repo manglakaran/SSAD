@@ -1,0 +1,62 @@
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#e4e4e4"
+
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:orientation="vertical"
+        android:layout_above="@+id/bottom"
+        tools:context="com.example.akhil.loginparse.contacts">
+
+        <EditText android:id="@+id/inputSearch"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search contacts.."
+            android:inputType="textVisiblePassword"/>
+
+        <ListView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/contactnames"
+
+            android:clickable="false"
+            android:layout_below="@+id/inputSearch"
+            android:layout_alignRight="@+id/tickImageView"
+            android:layout_alignEnd="@+id/tickImageView" />
+
+
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:id="@+id/bottom">
+
+        <Button
+            android:id="@+id/NextStep"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Next step"
+            android:background="#eb460f"
+            android:clickable="true"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
+</RelativeLayout>
+
+

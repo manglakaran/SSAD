@@ -1,0 +1,1 @@
+include ':app', ':demo:stock', ':demo:extras', ':library-extra', ':facebook'
